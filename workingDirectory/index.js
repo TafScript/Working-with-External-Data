@@ -11,7 +11,7 @@ const progressBar = document.getElementById("progressBar");
 const getFavouritesBtn = document.getElementById("getFavouritesBtn");
 
 // Step 0: Store your API key here for reference and easy access.
-const API_KEY = "";
+const API_KEY = "live_ny1coITWHsiGzrj1f0lyvgnlGnFPy6pJq9vMuTTIfUTbQb6hIUnOW7ie4wuvO7i5";
 
 /**
  * 1. Create an async function "initialLoad" that does the following:
@@ -21,6 +21,32 @@ const API_KEY = "";
  *  - Each option should display text equal to the name of the breed.
  * This function should execute immediately.
  */
+async function initialLoad() {
+  const url = `https://api.thecatapi.com/v1/breeds`;
+  
+
+  // a function to retrieve data from the API
+fetch(url, {
+  headers: {
+    "x-api-key": API_KEY,
+  },
+})
+  .then((response) => {
+    return response.json();
+  })
+  .then((data) => {
+    // Storing the retrieved data from the API in our variable
+    const getBreeds = data;
+
+
+    // Using function to select a specific breed. Then extracting information from that breed
+    
+  })
+  .catch(function (error) {
+    console.log(error);
+  });
+}
+
 
 /**
  * 2. Create an event handler for breedSelect that does the following:
@@ -71,7 +97,14 @@ const API_KEY = "";
  *   once or twice per request to this API. This is still a concept worth familiarizing yourself
  *   with for future projects.
  */
-
+function updateProgress(event) {
+  if (event.total) {
+    const percent = (event.loaded / event.total) * 100;
+    progressBar.style.width = percent + "%";
+  } else {
+    progressBar.style.width = "50%";
+  }
+}
 /**
  * 7. As a final element of progress indication, add the following to your axios interceptors:
  * - In your request interceptor, set the body element's cursor style to "progress."
