@@ -1,6 +1,6 @@
 import * as Carousel from "./Carousel.js";
 //import {favourite} from "./Carousel.js"
-//import axios from "axios";
+import axios from "axios";
 // Step 0: Store your API key here for reference and easy access.
 const API_KEY = "live_ny1coITWHsiGzrj1f0lyvgnlGnFPy6pJq9vMuTTIfUTbQb6hIUnOW7ie4wuvO7i5";
 
@@ -10,7 +10,7 @@ const API_KEY = "live_ny1coITWHsiGzrj1f0lyvgnlGnFPy6pJq9vMuTTIfUTbQb6hIUnOW7ie4w
 axios.defaults.baseURL = "https://api.thecatapi.com/v1";
 axios.defaults.headers.common["x-api-key"] = API_KEY;
 
-
+//const imgWrapper = document.getElementById("im")
 
 // The breed selection input element.
 const breedSelect = document.getElementById("breedSelect");
@@ -24,21 +24,21 @@ const getFavouritesBtn = document.getElementById("getFavouritesBtn");
 
 
 
-axios.interceptors.request.use(config => {
-  console.log("Request started:", config.url);
-  document.body.style.cursor = "progress" //shows loading cursor.
-  progressBar.style.width = "0%"; //reset
-  config.onDownloadProgress = updateProgress; // attach progress handler.
-  return config //returns object.
-});
+//axios.interceptors.request.use(config => {
+  //console.log("Request started:", config.url);
+  //document.body.style.cursor = "progress" //shows loading cursor.
+  //progressBar.style.width = "0%"; //reset
+  //config.onDownloadProgress = updateProgress; // attach progress handler.
+  //return config //returns object.
+//});
 
 //response interceptor
-axios.interceptors.response.use(response => {
-  console.log("Request finished:", response.config.url);
-  document.body.style.cursor = "default"; // reset cursor
-  progressBar.style.width = "100%"; // finished progress bar.
-  return response;
-}) 
+//axios.interceptors.response.use(response => {
+  //console.log("Request finished:", response.config.url);
+  //document.body.style.cursor = "default"; // reset cursor
+  //progressBar.style.width = "100%"; // finished progress bar.
+  //return response;
+//}) 
 
 /**
  * 1. Create an async function "initialLoad" that does the following:
@@ -48,29 +48,31 @@ axios.interceptors.response.use(response => {
  *  - Each option should display text equal to the name of the breed.
  * This function should execute immediately.
  */
-async function initialLoad() {
-  const url = `https://api.thecatapi.com/v1/breeds`;
+// async function initialLoad() {
+//   const url = `https://api.thecatapi.com/v1/breeds`;
 
-  //get promise res
-  const res = await fetch(url);
-  //parse res to json to use <--always call to read res body.
+//   //get promise res
+//   const res = await fetch(url);
+//   //parse res to json to use <--always call to read res body.
 
-  //returns an array of objects
-  const breedInfo = await res.json();
+//   //returns an array of objects
+//   const breedInfo = await res.json();
   
   
-  for (let i = 0; i < breedInfo.length; i++) {
-    const option = document.createElement("option");
-    option.value = breedInfo[i].id;
-    option.textContent = breedInfo[i].name;
-    breedSelect.appendChild(option);
-  }
+//   for (let i = 0; i < breedInfo.length; i++) {
+//     const option = document.createElement("option");
+//     option.value = breedInfo[i].id;
+//     option.textContent = breedInfo[i].name;
+//     breedSelect.appendChild(option);
+//   }
 
-  return breedInfo;
-}
+//   console.log("Breeds: ", breedInfo)
+
+//   return breedInfo;
+// }
 
 initialLoad();
-console.log(initialLoad())
+//console.log(initialLoad())
 
 
 /**
@@ -91,19 +93,19 @@ console.log(initialLoad())
 breedSelect.addEventListener("change", async (event) => {
   const selectedBreedId = event.target.value;
 
-  if (!breedId) return;
+  if (!selectedBreedId) return;
 
   try {
     //fetch images for breed (returns array)
-    const res = await fetch(`https://api.thecatapi.com/v1/images/search?limit=10&breed_ids=${breedId}`)
+    const res = await fetch(`https://api.thecatapi.com/v1/images/search?limit=10&breed_ids=${selectedBreedId}`)
     //parse, returns array objects
     const images = await res.json();
 
     Carousel.clear();
 
     for (let i = 0; i < images.length; i++) {
-      const breedInfo = images.breeds[0];
-      const item = Carousel.createCarouselItem(images.url, breedInfo.name, images.id, favourite)
+      const breedInfo = images[i].breeds[0];
+      const item = Carousel.createCarouselItem(images[i].url, breedInfo[i].name, images[i].id, favourite)
       Carousel.appendCarousel(item);
     }
 
@@ -118,7 +120,21 @@ breedSelect.addEventListener("change", async (event) => {
       infoTitle.textContent = breed.name;
 
       const infoDesc = document.createElement("p");
-      infoDesc = document.createElement("p");
+      infoDesc.textContent = breed.description
+
+
+      //temperament because we all want to know how dogs behave
+      const infoTemp = document.createElement("p");
+      infoTemp.textContent = "Temperament: " + temperament;
+
+      const infoLife = document.createElement("p");
+      infoLife.textContent = "Life Expectancy (in years): " + breed.life_span;
+
+      infoDump.appendChild(infoTitle);
+      infoDump.appendChild(infoDesc);
+      infoDump.appendChild(infoTemp);
+      infoDump.appendChild(infoLife);
+
     }
 
   } catch (error) {console.log("Problem receiving images: ", error)}
@@ -138,6 +154,23 @@ breedSelect.addEventListener("change", async (event) => {
  *   by setting a default header with your API key so that you do not have to
  *   send it manually with all of your requests! You can also set a default base URL!
  */
+
+  async function initialLoad() {
+  try {
+
+    //Axios get request
+    const res = await AxiosError.get("/breeds");
+    //gets data and saves in variable
+    const breedInfo = res.data
+
+    for (let i = 0; i < breedInfo.length; i++) {
+      const option = document.createElement("option");
+      option.value = breedInfo[i].id
+    }
+
+  } catch (error) {console.log("Error: ", error)}
+}
+
 /**
  * 5. Add axios interceptors to log the time between request and response to the console.
  * - Hint: you already have access to code that does this!
