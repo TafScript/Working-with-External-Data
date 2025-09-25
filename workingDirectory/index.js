@@ -68,6 +68,8 @@ async function initialLoad() {
 
   return breedInfo;
 }
+
+initialLoad();
 console.log(initialLoad())
 
 
@@ -85,6 +87,44 @@ console.log(initialLoad())
  * - Each new selection should clear, re-populate, and restart the Carousel.
  * - Add a call to this function to the end of your initialLoad function above to create the initial carousel.
  */
+
+breedSelect.addEventListener("change", async (event) => {
+  const selectedBreedId = event.target.value;
+
+  if (!breedId) return;
+
+  try {
+    //fetch images for breed (returns array)
+    const res = await fetch(`https://api.thecatapi.com/v1/images/search?limit=10&breed_ids=${breedId}`)
+    //parse, returns array objects
+    const images = await res.json();
+
+    Carousel.clear();
+
+    for (let i = 0; i < images.length; i++) {
+      const breedInfo = images.breeds[0];
+      const item = Carousel.createCarouselItem(images.url, breedInfo.name, images.id, favourite)
+      Carousel.appendCarousel(item);
+    }
+
+    Carousel.start();
+
+    //clear
+    infoDump.innerHTML = "";
+    if (images[0] && images[0].breeds[0]) {
+      const breed = images[0].breeds[0];
+
+      const infoTitle = document.createElement("h2");
+      infoTitle.textContent = breed.name;
+
+      const infoDesc = document.createElement("p");
+      infoDesc = document.createElement("p");
+    }
+
+  } catch (error) {console.log("Problem receiving images: ", error)}
+
+  //fetch the images for breed
+})
 
 /**
  * 3. Fork your own sandbox, creating a new one named "JavaScript Axios Lab."
