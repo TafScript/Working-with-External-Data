@@ -1,0 +1,12 @@
+{
+  "name": "r-alab_working_with_external_data",
+  "version": "1.0.0",
+  "description": "Api utilization",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}

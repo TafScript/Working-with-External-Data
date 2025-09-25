@@ -1,5 +1,16 @@
 import * as Carousel from "./Carousel.js";
-import axios from "axios";
+//import {favourite} from "./Carousel.js"
+//import axios from "axios";
+// Step 0: Store your API key here for reference and easy access.
+const API_KEY = "live_ny1coITWHsiGzrj1f0lyvgnlGnFPy6pJq9vMuTTIfUTbQb6hIUnOW7ie4wuvO7i5";
+
+
+//bassURL avoids repeating the full URL in every request
+//headers.common["x-api-key"] ensures the API key is sent automatically with every request
+axios.defaults.baseURL = "https://api.thecatapi.com/v1";
+axios.defaults.headers.common["x-api-key"] = API_KEY;
+
+
 
 // The breed selection input element.
 const breedSelect = document.getElementById("breedSelect");
@@ -10,8 +21,24 @@ const progressBar = document.getElementById("progressBar");
 // The get favourites button element.
 const getFavouritesBtn = document.getElementById("getFavouritesBtn");
 
-// Step 0: Store your API key here for reference and easy access.
-const API_KEY = "live_ny1coITWHsiGzrj1f0lyvgnlGnFPy6pJq9vMuTTIfUTbQb6hIUnOW7ie4wuvO7i5";
+
+
+
+axios.interceptors.request.use(config => {
+  console.log("Request started:", config.url);
+  document.body.style.cursor = "progress" //shows loading cursor.
+  progressBar.style.width = "0%"; //reset
+  config.onDownloadProgress = updateProgress; // attach progress handler.
+  return config //returns object.
+});
+
+//response interceptor
+axios.interceptors.response.use(response => {
+  console.log("Request finished:", response.config.url);
+  document.body.style.cursor = "default"; // reset cursor
+  progressBar.style.width = "100%"; // finished progress bar.
+  return response;
+}) 
 
 /**
  * 1. Create an async function "initialLoad" that does the following:
@@ -23,29 +50,25 @@ const API_KEY = "live_ny1coITWHsiGzrj1f0lyvgnlGnFPy6pJq9vMuTTIfUTbQb6hIUnOW7ie4w
  */
 async function initialLoad() {
   const url = `https://api.thecatapi.com/v1/breeds`;
+
+  //get promise res
+  const res = await fetch(url);
+  //parse res to json to use <--always call to read res body.
+
+  //returns an array of objects
+  const breedInfo = await res.json();
   
+  
+  for (let i = 0; i < breedInfo.length; i++) {
+    const option = document.createElement("option");
+    option.value = breedInfo[i].id;
+    option.textContent = breedInfo[i].name;
+    breedSelect.appendChild(option);
+  }
 
-  // a function to retrieve data from the API
-fetch(url, {
-  headers: {
-    "x-api-key": API_KEY,
-  },
-})
-  .then((response) => {
-    return response.json();
-  })
-  .then((data) => {
-    // Storing the retrieved data from the API in our variable
-    const getBreeds = data;
-
-
-    // Using function to select a specific breed. Then extracting information from that breed
-    
-  })
-  .catch(function (error) {
-    console.log(error);
-  });
+  return breedInfo;
 }
+console.log(initialLoad())
 
 
 /**
