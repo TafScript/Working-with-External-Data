@@ -48,7 +48,7 @@ async function initialLoad() {
 }
 
 
-    // Automatically load first breed on page load
+    // Automatically load first breed after page loads
     if (breeds.length > 0) {
       loadBreedImages(breeds[0].id);
     }
@@ -81,7 +81,7 @@ async function loadBreedImages(breedId) {
     for (let i = 0; i < images.length; i++) {
       const imgObj = images[i];
       const breedInfo = imgObj.breeds[0];
-      const item = Carousel.createCarouselItem(imgObj.url, breedInfo ? breedInfo.name : "", imgObj.id);
+      const item = Carousel.createCarouselItem(imgObj.url, breedInfo.name, imgObj.id);
       Carousel.appendCarousel(item);
     }
 
@@ -159,11 +159,19 @@ initialLoad();
 
 // --- Add interceptors here ---
 axios.interceptors.request.use(config => {
+  document.body.style.cursor = "progress";
+  progressBar.style.width = "0%";
+  config.onDownloadProgress = updateProgress;
+
   console.log("Request started:", config.url);
   return config;
 });
 
 axios.interceptors.response.use(response => {
+
+  document.body.style.cursor = "default";
+  progressBar.style.width = "100%";
+
   console.log("Request finished:", response.config.url);
   return response;
 });
