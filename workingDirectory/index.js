@@ -116,6 +116,10 @@ async function loadBreedImages(breedId) {
   }
 }
 
+// Initialize
+initialLoad();
+console.log(initialLoad())
+
 /**
  * 2. Create an event handler for breedSelect that does the following:
  * - Retrieve information on the selected breed from the cat API using fetch().
@@ -146,8 +150,7 @@ breedSelect.addEventListener("change", (event) => {
   loadBreedImages(event.target.value);
 });
 
-// Initialize
-initialLoad();
+
 
 /**
  * 5. Add axios interceptors to log the time between request and response to the console.
@@ -212,6 +215,29 @@ axios.interceptors.response.use(response => {
 
 // Placeholder favourite function (used in Carousel.js)
 export async function favourite(imgId) {
-  console.log("Favourited image ID:", imgId);
-  // Here you can implement actual API POST/DELETE to /favourites
+  try {
+    //retrieve favorites
+    const SUB_ID = "placeholder_id";
+
+    const res = await axios.get("/favourites", {params: { sub_id: SUB_ID}});
+    const favourites = res.data;
+
+    const currentFav = res.data.find(fav => fav.image_id === imgId);
+
+    if (currentFav) {
+      //if exists, delete
+      await axios.delete(`/favourites/${currentFav.id}`);
+      console.log(`Removed favorite: {imgId}`);
+    } else {
+      // create favorite
+      await axios.post("/favourites", {
+        image_id: imgId,
+        sub_id: SUB_ID
+      });
+      console.log(`Added favourite: ${imgId}`)
+    }
+
+  } catch (error) {
+    console.log("Error: ", error);
+  }
 }
